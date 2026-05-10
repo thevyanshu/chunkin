@@ -1,27 +1,33 @@
-# Document Chunker
+# Document Chunker & Indexer
 
-A Python module for processing and chunking various document formats for vector store indexing.
+A Python module for processing and chunking various document formats, and indexing them into vector stores.
 
-## Features
+## Modules
 
-- **Multi-format support**: PDF, DOCX, TXT, MD, CSV, XLSX, PPT
-- **6 Chunking strategies**: recursive, character, markdown, markdown_headers, html_headers, semantic
-- **Batch processing**: Process all documents in a directory
-- **Streaming**: Memory-efficient batch processing
-- **Output management**: Save chunks to JSON, configurable output directory
-- **Internal store**: Access chunks after processing
+### [Document Chunker](usage.md)
+Process documents and create chunks for vector store indexing.
+
+### [Doc Indexer](indexer.md)
+Index chunks into various vector stores and perform similarity search.
 
 ## Quick Start
 
 ```python
 from doc_chunker import DocumentChunker
+from doc_indexer import DocIndexer
+from langchain_openai import OpenAIEmbeddings
 
-# Single file
-chunker = DocumentChunker(output_dir="chunks")
+# Chunk documents
+chunker = DocumentChunker()
 chunks = chunker.create_chunks("document.pdf")
 
-# Batch processing
-all_chunks = chunker.batch_chunks("path/to/documents")
+# Index to vector store
+embeddings = OpenAIEmbeddings()
+indexer = DocIndexer(vector_store_type="faiss", embeddings=embeddings)
+indexer.index_documents(chunks)
+
+# Search
+results = indexer.search("your query", k=3)
 ```
 
 ## Supported Formats

@@ -1,0 +1,17 @@
+# Dependencies for doc_indexer module
+langchain>=0.3.0
+langchain-community>=0.3.0
+langchain-chroma>=0.3.0
+langchain-milvus>=0.3.0
+langchain-pinecone>=0.3.0
+langchain-postgres>=0.3.0
+langchain-mongodb>=0.3.0
+langchain-elasticsearch>=0.3.0
+langchain-azure-ai>=0.3.0
+langchain-qdrant>=0.3.0
+langchain-weaviate>=0.3.0
+langchain-astradb>=0.3.0
+faiss-cpu
+pymilvus
+pymongo
+psycopg
