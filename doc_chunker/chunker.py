@@ -118,7 +118,7 @@ class DocumentChunker:
         add_start_index: bool,
         nb_suffix: int,
     ):
-        from langchain_experimental.text_splitters import SemanticChunker
+        from langchain_experimental.text_splitter import SemanticChunker
 
         if strategy == "recursive":
             return RecursiveCharacterTextSplitter(
@@ -139,14 +139,23 @@ class DocumentChunker:
             return MarkdownTextSplitter(
                 chunk_size=chunk_size,
                 chunk_overlap=chunk_overlap,
-                separators=separators,
-                is_separator_regex=is_separator_regex,
-                keep_separator=keep_separator,
             )
         elif strategy == "markdown_headers":
-            return MarkdownHeaderTextSplitter(separators=separators)
+            return MarkdownHeaderTextSplitter(
+                headers_to_split_on=separators or [
+                    ("#", "Header 1"),
+                    ("##", "Header 2"),
+                    ("###", "Header 3"),
+                ]
+            )
         elif strategy == "html_headers":
-            return HTMLHeaderTextSplitter(separators=separators)
+            return HTMLHeaderTextSplitter(
+                headers_to_split_on=separators or [
+                    ("h1", "Header 1"),
+                    ("h2", "Header 2"),
+                    ("h3", "Header 3"),
+                ]
+            )
         elif strategy == "semantic":
             return SemanticChunker(
                 embeddings=embeddings,

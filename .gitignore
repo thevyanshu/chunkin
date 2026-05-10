@@ -1,5 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+.venv
+
 # Planning notes
 CHUNKER_PLAN.md
 
 # MkDocs site
 site/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Test/Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+pytest.ini
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Generated data files
+*.json
+!**/*.example.json
+chunks/
+faiss_index/
+chroma_db/
+milvus.db
+lancedb/
+deeplake/
+tiledb/
+lambdadb/
+annoy_index/
+*.db
+*.sqlite
+*.sqlite3
