@@ -16,24 +16,29 @@ Index chunks into various vector stores and perform similarity search.
 - **Unified API** for all vector stores
 - **Search** with metadata filtering
 
+### [Doc Processor](processor.md)
+Unified end-to-end processing combining chunking and indexing.
+- **Single initialization** for both modules
+- **All chunking + indexing options**
+- **process_file/directory()** for easy workflows
+
 ## Quick Start
 
 ```python
-from doc_chunker import DocumentChunker
-from doc_indexer import DocIndexer
+from doc_processor import DocProcessor
 from langchain_openai import OpenAIEmbeddings
 
-# Chunk documents
-chunker = DocumentChunker()
-chunks = chunker.create_chunks("document.pdf")
+processor = DocProcessor(
+    embeddings=OpenAIEmbeddings(),
+    vector_store_type="faiss",
+    chunk_size=500,
+)
 
-# Index to vector store
-embeddings = OpenAIEmbeddings()
-indexer = DocIndexer(vector_store_type="faiss", embeddings=embeddings)
-indexer.index_documents(chunks)
+# Process file
+processor.process_file("document.pdf")
 
 # Search
-results = indexer.search("your query", k=3)
+results = processor.search("your query", k=3)
 ```
 
 ## Supported Formats

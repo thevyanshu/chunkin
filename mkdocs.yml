@@ -16,6 +16,7 @@ nav:
   - API Reference: api.md
   - Strategies: strategies.md
   - Indexer: indexer.md
+  - Doc Processor: processor.md
 
 markdown_extensions:
   - pymdownx.highlight:
