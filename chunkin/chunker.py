@@ -22,6 +22,13 @@ from langchain_text_splitters import (
     MarkdownHeaderTextSplitter,
 )
 
+try:
+    from langchain_experimental.text_splitter import SemanticChunker
+    _SEMANTIC_CHUNKER_AVAILABLE = True
+except ImportError:
+    SemanticChunker = None
+    _SEMANTIC_CHUNKER_AVAILABLE = False
+
 
 class DocumentChunker:
     _EXTENSION_LOADER_MAP = {
@@ -80,6 +87,12 @@ class DocumentChunker:
         self.save_chunks = save_chunks
         self._chunks: Dict[str, List[Document]] = {}
 
+        if chunk_overlap >= chunk_size:
+            raise ValueError(
+                f"chunk_overlap ({chunk_overlap}) must be less than chunk_size ({chunk_size}). "
+                "Otherwise chunking may produce unexpected results."
+            )
+
         if strategy == "semantic" and embeddings is None:
             raise ValueError(
                 "embeddings parameter is required for semantic chunking strategy. "
@@ -118,8 +131,6 @@ class DocumentChunker:
         add_start_index: bool,
         nb_suffix: int,
     ):
-        from langchain_experimental.text_splitter import SemanticChunker
-
         if strategy == "recursive":
             return RecursiveCharacterTextSplitter(
                 chunk_size=chunk_size,
@@ -129,10 +140,11 @@ class DocumentChunker:
                 keep_separator=keep_separator,
             )
         elif strategy == "character":
+            separator = separators[0] if separators and len(separators) > 0 else "\n"
             return CharacterTextSplitter(
                 chunk_size=chunk_size,
                 chunk_overlap=chunk_overlap,
-                separator=separators[0] if separators else "\n",
+                separator=separator,
                 is_separator_regex=is_separator_regex,
             )
         elif strategy == "markdown":
@@ -157,6 +169,11 @@ class DocumentChunker:
                 ]
             )
         elif strategy == "semantic":
+            if not _SEMANTIC_CHUNKER_AVAILABLE:
+                raise ImportError(
+                    "langchain_experimental is required for semantic chunking. "
+                    "Install with: pip install langchain-experimental"
+                )
             return SemanticChunker(
                 embeddings=embeddings,
                 breakpoint_threshold_type=breakpoint_threshold_type,
@@ -244,6 +261,9 @@ class DocumentChunker:
 
         extensions = [ext.lower() if ext.startswith(".") else f".{ext.lower()}" for ext in extensions]
 
+        if not extensions:
+            raise ValueError("extensions cannot be empty. Provide at least one valid extension.")
+
         valid_extensions = set(self._EXTENSION_LOADER_MAP.keys())
         invalid = set(extensions) - valid_extensions
         if invalid:
@@ -275,6 +295,10 @@ class DocumentChunker:
             extensions = list(self._EXTENSION_LOADER_MAP.keys())
 
         extensions = [ext.lower() if ext.startswith(".") else f".{ext.lower()}" for ext in extensions]
+
+        if not extensions:
+            raise ValueError("extensions cannot be empty. Provide at least one valid extension.")
+
         pattern = "**/*" if recursive else "*"
 
         for file_path in Path(directory).glob(pattern):

@@ -10,6 +10,7 @@ build/
 
 # Planning notes
 CHUNKER_PLAN.md
+bugreport.md
 
 # MkDocs site
 site/

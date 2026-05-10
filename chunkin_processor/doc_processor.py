@@ -141,13 +141,13 @@ class DocProcessor:
             except Exception as e:
                 print(f"Error processing {file_path}: {e}")
 
-    def search(self, query: str, k: int = 4, filter: Optional[Dict[str, Any]] = None) -> List[Document]:
-        return self._indexer.search(query, k=k, filter=filter)
+    def search(self, query: str, k: int = 4, filters: Optional[Dict[str, Any]] = None) -> List[Document]:
+        return self._indexer.search(query, k=k, filters=filters)
 
     def search_with_score(
-        self, query: str, k: int = 4, filter: Optional[Dict[str, Any]] = None
+        self, query: str, k: int = 4, filters: Optional[Dict[str, Any]] = None
     ) -> List[tuple[Document, float]]:
-        return self._indexer.search_with_score(query, k=k, filter=filter)
+        return self._indexer.search_with_score(query, k=k, filters=filters)
 
     def delete(self, ids: Optional[List[str]] = None) -> None:
         self._indexer.delete(ids=ids)

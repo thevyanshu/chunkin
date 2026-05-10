@@ -99,6 +99,7 @@ class DocIndexer:
         self.kwargs = kwargs
         self._vector_store = None
         self._indexed_count = 0
+        self._connection = None
 
         if embeddings is None:
             raise ValueError("embeddings parameter is required")
@@ -211,7 +212,14 @@ class DocIndexer:
         from langchain_community.docstore.in_memory import InMemoryDocstore
         from langchain_community.vectorstores import FAISS
 
-        embedding_dim = len(self.embeddings.embed_query("hello world"))
+        try:
+            embedding_dim = len(self.embeddings.embed_query("hello world"))
+        except Exception as e:
+            raise RuntimeError(
+                f"Failed to initialize embeddings for FAISS: {e}. "
+                "Ensure your embeddings model is properly configured and can embed queries."
+            ) from e
+
         index = faiss.IndexFlatL2(embedding_dim)
 
         self._vector_store = FAISS(
@@ -433,10 +441,10 @@ class DocIndexer:
             raise ValueError("Oracle: dsn, username, password required (or env vars)")
 
         import oracledb
-        connection = oracledb.connect(user=username, password=password, dsn=dsn)
+        self._connection = oracledb.connect(user=username, password=password, dsn=dsn)
 
         self._vector_store = OracleVS(
-            client=connection,
+            client=self._connection,
             embedding_function=self.embeddings,
             table_name=self.collection_name,
             distance_strategy=self.kwargs.get("distance_strategy", DistanceStrategy.EUCLIDEAN_DISTANCE),
@@ -905,13 +913,13 @@ class DocIndexer:
         self,
         query: str,
         k: int = 4,
-        filter: Optional[Dict[str, Any]] = None,
+        filters: Optional[Dict[str, Any]] = None,
         **kwargs,
     ) -> List[Document]:
         return self._vector_store.similarity_search(
             query,
             k=k,
-            filter=filter,
+            filter=filters,
             **kwargs,
         )
 
@@ -919,13 +927,13 @@ class DocIndexer:
         self,
         query: str,
         k: int = 4,
-        filter: Optional[Dict[str, Any]] = None,
+        filters: Optional[Dict[str, Any]] = None,
         **kwargs,
     ) -> List[tuple[Document, float]]:
         return self._vector_store.similarity_search_with_score(
             query,
             k=k,
-            filter=filter,
+            filter=filters,
             **kwargs,
         )
 
@@ -943,7 +951,11 @@ class DocIndexer:
             return self.persist_directory or "./chroma_db"
         elif self.vector_store_type == "lancedb":
             return self.persist_directory or "./lancedb"
-        return ""
+        else:
+            raise NotImplementedError(
+                f"Save not supported for {self.vector_store_type}. "
+                "Supported: faiss, chroma, lancedb"
+            )
 
     def load(self, directory: str) -> None:
         if self.vector_store_type == "faiss":
@@ -955,6 +967,11 @@ class DocIndexer:
             )
         else:
             raise NotImplementedError(f"Load not supported for {self.vector_store_type}")
+
+    def close(self) -> None:
+        if self._connection is not None:
+            self._connection.close()
+            self._connection = None
 
     @property
     def vector_store(self):
