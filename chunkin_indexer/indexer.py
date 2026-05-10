@@ -957,13 +957,25 @@ class DocIndexer:
                 "Supported: faiss, chroma, lancedb"
             )
 
-    def load(self, directory: str) -> None:
+    def load(self, directory: str, allow_dangerous_deserialization: bool = False) -> None:
         if self.vector_store_type == "faiss":
             from langchain_community.vectorstores import FAISS
+
+            if not allow_dangerous_deserialization:
+                import os
+                index_file = os.path.join(directory, "index.faiss")
+                if os.path.exists(index_file):
+                    raise ValueError(
+                        "Loading FAISS index with allow_dangerous_deserialization=False (default). "
+                        "This is for security - FAISS uses pickle which can execute arbitrary code. "
+                        "Only set to True if you trust the source of the index files. "
+                        "To load, explicitly call: indexer.load(directory, allow_dangerous_deserialization=True)"
+                    )
+
             self._vector_store = FAISS.load_local(
                 directory,
                 self.embeddings,
-                allow_dangerous_deserialization=True,
+                allow_dangerous_deserialization=allow_dangerous_deserialization,
             )
         else:
             raise NotImplementedError(f"Load not supported for {self.vector_store_type}")
