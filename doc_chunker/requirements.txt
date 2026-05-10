@@ -1,0 +1,8 @@
+# Dependencies for doc_chunker module
+langchain>=0.3.0
+langchain-text-splitters>=0.3.0
+langchain-community>=0.3.0
+langchain-openai>=0.3.0
+pypdf>=5.0.0
+openpyxl>=3.1.0
+python-magic-bin>=0.4.14
