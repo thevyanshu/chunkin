@@ -1,19 +1,19 @@
-# Document Chunker & Indexer
+# Chunkin
 
-A Python library for processing documents and indexing them into vector stores.
+A Python library for document chunking and indexing into vector stores.
 
 ## Modules
 
 | Module | Description |
 |--------|-------------|
-| [doc_chunker](doc_chunker/) | Chunk documents (PDF, DOCX, TXT, MD, CSV, XLSX, PPT) |
-| [doc_indexer](doc_indexer/) | Index chunks to 50+ vector stores |
-| [doc_processor](doc_processor/) | Unified end-to-end processing |
+| `chunkin` | Document chunking (PDF, DOCX, TXT, MD, CSV, XLSX, PPT) |
+| `chunkin_indexer` | Index chunks to 50+ vector stores |
+| `chunkin_processor` | Unified end-to-end processing |
 
 ## Quick Start
 
 ```python
-from doc_processor import DocProcessor
+from chunkin_processor import DocProcessor
 from langchain_openai import OpenAIEmbeddings
 
 processor = DocProcessor(
@@ -29,13 +29,25 @@ results = processor.search("your query", k=3)
 ## Installation
 
 ```bash
-# Core dependencies
-pip install langchain langchain-text-splitters langchain-community pypdf openpyxl
+# Core only
+pip install chunkin
 
-# For specific features
-pip install -r doc_chunker/requirements.txt
-pip install -r doc_indexer/requirements.txt
-pip install -r doc_processor/requirements.txt
+# With OpenAI + FAISS (recommended)
+pip install chunkin[core]
+
+# With semantic chunking
+pip install chunkin[semantic]
+
+# Local vector stores (Chroma, Milvus, LanceDB, etc.)
+pip install chunkin[local]
+
+# Specific cloud providers
+pip install chunkin[aws]     # Amazon AWS
+pip install chunkin[azure]   # Microsoft Azure
+pip install chunkin[gcp]     # Google Cloud
+
+# All vector stores
+pip install chunkin[all]
 ```
 
 ## Documentation
@@ -63,21 +75,21 @@ pip install -r doc_processor/requirements.txt
 ## Supported Vector Stores
 
 ### Local (No External Service)
-- FAISS, Chroma, Milvus, LanceDB, LambdaDB, Deep Lake, Annoy
+FAISS, Chroma, Milvus, LanceDB, LambdaDB, Deep Lake, Annoy
 
 ### Amazon AWS
-- OpenSearch, Valkey, DocumentDB
+OpenSearch, Valkey, DocumentDB
 
 ### Microsoft Azure
-- Azure AI Search, Azure Cosmos DB, Azure Cosmos DB NoSQL
+Azure AI Search, Azure Cosmos DB, Azure Cosmos DB NoSQL
 
 ### Google Cloud
-- Databricks Vector Search, Vertex AI Vector Search, BigQuery, AlloyDB
+Databricks Vector Search, Vertex AI Vector Search, BigQuery, AlloyDB
 
 ### Other
-- Qdrant, Weaviate, Pinecone, MongoDB Atlas, PGVector, Astra DB,
-- Elasticsearch, Oracle, Neo4j, SingleStore, Supabase, MyScale,
-- Zilliz, Marqo, Vectara, Meilisearch, Typesense, and more...
+Qdrant, Weaviate, Pinecone, MongoDB Atlas, PGVector, Astra DB,
+Elasticsearch, Oracle, Neo4j, SingleStore, Supabase, MyScale,
+Zilliz, Marqo, Vectara, Meilisearch, Typesense, and more...
 
 See [docs/indexer.md](docs/indexer.md) for full list.
 
@@ -97,35 +109,37 @@ See [docs/strategies.md](docs/strategies.md) for details.
 ## Project Structure
 
 ```
-Indexer/
-├── doc_chunker/          # Document chunking module
-│   ├── chunker.py        # Main DocumentChunker class
-│   └── examples/         # Usage examples
-├── doc_indexer/          # Vector store indexing module
-│   ├── indexer.py        # Main DocIndexer class
-│   └── examples/         # Usage examples
-├── doc_processor/         # Unified module
-│   ├── doc_processor.py  # Main DocProcessor class
-│   └── examples/         # Usage examples
-├── docs/                 # MkDocs documentation
-│   ├── index.md         # Home
-│   ├── usage.md         # Usage guide
-│   ├── api.md           # API reference
-│   ├── strategies.md    # Chunking strategies
-│   ├── indexer.md       # Vector stores
-│   └── processor.md     # Doc Processor
-├── mkdocs.yml           # MkDocs config
+chunkin/
+├── chunkin/                 # Document chunking module
+│   ├── doc_chunker.py      # DocumentChunker class
+│   └── examples/          # Usage examples
+├── chunkin_indexer/         # Vector store indexing module
+│   ├── doc_indexer.py     # DocIndexer class
+│   └── examples/          # Usage examples
+├── chunkin_processor/      # Unified module
+│   ├── doc_processor.py   # DocProcessor class
+│   └── examples/          # Usage examples
+├── docs/                   # MkDocs documentation
+├── pyproject.toml          # Package configuration
 └── README.md
 ```
 
 ## Development
 
 ```bash
-# Install all dependencies
-pip install -r doc_chunker/requirements.txt
-pip install -r doc_indexer/requirements.txt
-pip install -r doc_processor/requirements.txt
+# Install with dev dependencies
+pip install -e ".[dev]"
+
+# Run tests
+pytest tests/
+
+# Build package
+python -m build
 
 # Serve docs locally
 cd docs && pip install -r requirements.txt && mkdocs serve
 ```
+
+## License
+
+MIT License

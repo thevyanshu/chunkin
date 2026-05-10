@@ -1,6 +1,6 @@
-# Document Chunker & Indexer
+# Chunkin - Document Chunker & Indexer
 
-A Python module for processing and chunking various document formats, and indexing them into vector stores.
+A Python library for processing and chunking various document formats, and indexing them into vector stores.
 
 ## Modules
 
@@ -25,7 +25,7 @@ Unified end-to-end processing combining chunking and indexing.
 ## Quick Start
 
 ```python
-from doc_processor import DocProcessor
+from chunkin_processor import DocProcessor
 from langchain_openai import OpenAIEmbeddings
 
 processor = DocProcessor(
@@ -52,3 +52,22 @@ results = processor.search("your query", k=3)
 | CSV | `.csv` | `source` |
 | Excel | `.xlsx`, `.xls` | `source` |
 | PowerPoint | `.pptx`, `.ppt` | `source` |
+
+## Installation
+
+```bash
+# Core only
+pip install chunkin
+
+# With OpenAI + FAISS
+pip install chunkin[core]
+
+# With semantic chunking
+pip install chunkin[semantic]
+
+# Local vector stores
+pip install chunkin[local]
+
+# All vector stores
+pip install chunkin[all]
+```
