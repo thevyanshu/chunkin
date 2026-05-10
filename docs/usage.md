@@ -3,7 +3,7 @@
 ## Basic Usage
 
 ```python
-from doc_chunker import DocumentChunker
+from chunkin import DocumentChunker
 
 chunker = DocumentChunker()
 chunks = chunker.create_chunks("path/to/document.pdf")
@@ -22,17 +22,19 @@ chunks = chunker.create_chunks("document.pdf")
 
 ## Choosing a Strategy
 
+Chunkin uses [LangChain text splitters](https://python.langchain.com/docs/modules/data_connection/document_transformers/) for all chunking strategies:
+
 ```python
-# Recursive (default)
+# Recursive (default) - uses RecursiveCharacterTextSplitter
 chunker = DocumentChunker(strategy="recursive")
 
-# Character-based
+# Character-based - uses CharacterTextSplitter
 chunker = DocumentChunker(strategy="character", chunk_size=300)
 
-# Markdown-aware
+# Markdown-aware - uses MarkdownTextSplitter
 chunker = DocumentChunker(strategy="markdown", chunk_size=800)
 
-# Semantic chunking
+# Semantic chunking - uses SemanticChunker (LangChain experimental)
 from langchain_openai import OpenAIEmbeddings
 
 chunker = DocumentChunker(
@@ -40,6 +42,8 @@ chunker = DocumentChunker(
     embeddings=OpenAIEmbeddings(),
 )
 ```
+
+See [Chunking Strategies](strategies.md) for details on each strategy.
 
 ## Output Directory & Saving
 
@@ -122,7 +126,7 @@ Each chunk includes metadata:
 
 ```python
 {
-    "source": "path/to/document.pdf",  # from loader
+    "source": "path/to/document.pdf",  # from LangChain loader
     "page": 0,                          # from loader (PDF only)
     "chunk_index": 0,                    # added by DocumentChunker
     "source_file": "document.pdf",      # added by DocumentChunker
@@ -140,8 +144,10 @@ for chunk in chunks:
 
 ## Supported Formats
 
-| Format | Extension | Loader |
-|--------|-----------|--------|
+Chunkin uses [LangChain document loaders](https://python.langchain.com/docs/integrations/document_loaders/) for format support:
+
+| Format | Extension | LangChain Loader |
+|--------|-----------|------------------|
 | PDF | `.pdf` | PyPDFLoader |
 | Word | `.docx`, `.doc` | UnstructuredWordDocumentLoader |
 | Text | `.txt` | TextLoader |
@@ -149,3 +155,5 @@ for chunk in chunks:
 | CSV | `.csv` | CSVLoader |
 | Excel | `.xlsx`, `.xls` | UnstructuredExcelLoader |
 | PowerPoint | `.pptx`, `.ppt` | UnstructuredPowerPointLoader |
+
+For a full list of available document loaders in LangChain, see the [LangChain documentation](https://python.langchain.com/docs/integrations/document_loaders/).

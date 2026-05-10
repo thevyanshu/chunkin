@@ -1,13 +1,23 @@
 # Chunkin
 
-A Python library for document chunking and indexing into vector stores.
+A Python library for document chunking and indexing into vector stores, built on [LangChain](https://python.langchain.com/).
+
+## Built on LangChain
+
+Chunkin leverages [LangChain](https://python.langchain.com/) for:
+
+- **Document Loaders**: Load PDF, DOCX, TXT, MD, CSV, XLSX, PPT formats
+- **Text Splitters**: 6 chunking strategies including semantic chunking
+- **Vector Stores**: 50+ vector store integrations (FAISS, Chroma, Pinecone, etc.)
+
+Learn more about [LangChain's document processing capabilities](https://python.langchain.com/docs/modules/data_connection/).
 
 ## Modules
 
 | Module | Description |
 |--------|-------------|
-| `chunkin` | Document chunking (PDF, DOCX, TXT, MD, CSV, XLSX, PPT) |
-| `chunkin_indexer` | Index chunks to 50+ vector stores |
+| `chunkin` | Document chunking using [LangChain text splitters](strategies.md) |
+| `chunkin_indexer` | Index chunks to 50+ vector stores via [LangChain integrations](https://python.langchain.com/docs/integrations/vectorstores/) |
 | `chunkin_processor` | Unified end-to-end processing |
 
 ## Quick Start
@@ -62,6 +72,8 @@ pip install chunkin[all]
 
 ## Supported Formats
 
+Chunkin uses [LangChain document loaders](https://python.langchain.com/docs/integrations/document_loaders/):
+
 | Format | Extensions |
 |--------|-----------|
 | PDF | `.pdf` |
@@ -73,6 +85,8 @@ pip install chunkin[all]
 | PowerPoint | `.pptx`, `.ppt` |
 
 ## Supported Vector Stores
+
+Built on [LangChain vector store integrations](https://python.langchain.com/docs/integrations/vectorstores/):
 
 ### Local (No External Service)
 FAISS, Chroma, Milvus, LanceDB, LambdaDB, Deep Lake, Annoy
@@ -95,14 +109,16 @@ See [docs/indexer.md](docs/indexer.md) for full list.
 
 ## Supported Chunking Strategies
 
-| Strategy | Description |
-|----------|-------------|
-| `recursive` | Recursively splits by paragraphs, sentences, words |
-| `character` | Simple character-based splitting |
-| `markdown` | Markdown-aware splitting |
-| `markdown_headers` | Split by markdown headers |
-| `html_headers` | Split by HTML header tags |
-| `semantic` | Embedding-based semantic splitting |
+Uses [LangChain text splitters](https://python.langchain.com/docs/modules/data_connection/document_transformers/):
+
+| Strategy | LangChain Class | Description |
+|----------|-----------------|-------------|
+| `recursive` | RecursiveCharacterTextSplitter | Recursively splits by paragraphs, sentences, words |
+| `character` | CharacterTextSplitter | Simple character-based splitting |
+| `markdown` | MarkdownTextSplitter | Markdown-aware splitting |
+| `markdown_headers` | MarkdownHeaderTextSplitter | Split by markdown headers |
+| `html_headers` | HTMLHeaderTextSplitter | Split by HTML header tags |
+| `semantic` | SemanticChunker | Embedding-based semantic splitting |
 
 See [docs/strategies.md](docs/strategies.md) for details.
 
@@ -111,16 +127,13 @@ See [docs/strategies.md](docs/strategies.md) for details.
 ```
 chunkin/
 ├── chunkin/                 # Document chunking module
-│   ├── doc_chunker.py      # DocumentChunker class
-│   └── examples/          # Usage examples
+│   └── chunker.py          # DocumentChunker class
 ├── chunkin_indexer/         # Vector store indexing module
-│   ├── doc_indexer.py     # DocIndexer class
-│   └── examples/          # Usage examples
-├── chunkin_processor/      # Unified module
-│   ├── doc_processor.py   # DocProcessor class
-│   └── examples/          # Usage examples
-├── docs/                   # MkDocs documentation
-├── pyproject.toml          # Package configuration
+│   └── indexer.py          # DocIndexer class
+├── chunkin_processor/       # Unified module
+│   └── doc_processor.py    # DocProcessor class
+├── docs/                    # MkDocs documentation
+├── pyproject.toml           # Package configuration
 └── README.md
 ```
 
@@ -139,6 +152,13 @@ python -m build
 # Serve docs locally
 cd docs && pip install -r requirements.txt && mkdocs serve
 ```
+
+## LangChain Resources
+
+- [LangChain Documentation](https://python.langchain.com/)
+- [Text Splitters](https://python.langchain.com/docs/modules/data_connection/document_transformers/)
+- [Vector Stores](https://python.langchain.com/docs/modules/data_connection/vectorstores/)
+- [Document Loaders](https://python.langchain.com/docs/integrations/document_loaders/)
 
 ## License
 

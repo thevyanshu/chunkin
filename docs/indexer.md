@@ -1,19 +1,19 @@
 # Doc Indexer
 
-A Python module for indexing chunked documents into various vector stores.
+A Python module for indexing chunked documents into various vector stores. Built on [LangChain's vector store integrations](https://python.langchain.com/docs/modules/data_connection/vectorstores/).
 
 ## Features
 
 - **50+ vector store support** including local and cloud options
 - **Local-first options**: FAISS, Chroma, Milvus, LanceDB, LambdaDB, Deep Lake (no external service required)
-- **Unified interface**: Same API for all vector stores
+- **Unified interface**: Same API for all vector stores using [LangChain's VectorStore interface](https://python.langchain.com/docs/modules/data_connection/vectorstores/)
 - **Search**: Similarity search with optional metadata filtering
 
 ## Quick Start
 
 ```python
-from doc_chunker import DocumentChunker
-from doc_indexer import DocIndexer
+from chunkin import DocumentChunker
+from chunkin_indexer import DocIndexer
 from langchain_openai import OpenAIEmbeddings
 
 # Chunk documents
@@ -29,12 +29,20 @@ indexer.index_documents(chunks)
 results = indexer.search("your query", k=3)
 ```
 
+## LangChain Integration
+
+DocIndexer uses [LangChain vector stores](https://python.langchain.com/docs/integrations/vectorstores/) for all vector store implementations. This provides:
+
+- Consistent API across all vector stores
+- Access to the latest vector store features from LangChain
+- Easy swapping between vector stores without code changes
+
 ## Supported Vector Stores
 
 ### Local (No External Service)
 
-| Store | Type | Package |
-|-------|------|---------|
+| Store | Type | LangChain Package |
+|-------|------|-------------------|
 | FAISS | In-memory + file | langchain-community |
 | Chroma | Local DB | langchain-chroma |
 | Milvus | SQLite | langchain-milvus |
@@ -103,7 +111,12 @@ results = indexer.search("your query", k=3)
 ## All Supported Stores
 
 ```python
-from doc_indexer import DocIndexer
+from chunkin_indexer import DocIndexer
 print(DocIndexer.supported_stores())
 # Returns list of all 50+ supported vector store types
 ```
+
+## Further Reading
+
+- [LangChain Vector Store Integrations](https://python.langchain.com/docs/integrations/vectorstores/)
+- [LangChain VectorStore Class](https://python.langchain.com/docs/modules/data_connection/vectorstores/)

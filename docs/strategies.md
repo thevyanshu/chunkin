@@ -1,8 +1,10 @@
 # Chunking Strategies
 
+Chunkin uses [LangChain text splitters](https://python.langchain.com/docs/modules/data_connection/document_transformers/) for all chunking strategies. These are battle-tested components that provide high-quality document splitting.
+
 ## recursive (Default)
 
-`RecursiveCharacterTextSplitter` - Recursively splits text using hierarchy of separators.
+`RecursiveCharacterTextSplitter` from [LangChain](https://python.langchain.com/docs/modules/data_connection/document_transformers/) - Recursively splits text using a hierarchy of separators.
 
 Default separators: `["\n\n", "\n", " ", ""]`
 
@@ -14,7 +16,7 @@ chunker = DocumentChunker(strategy="recursive")
 
 ## character
 
-`CharacterTextSplitter` - Simple character-based splitting.
+`CharacterTextSplitter` from [LangChain](https://python.langchain.com/docs/modules/data_connection/document_transformers/) - Simple character-based splitting.
 
 Best for: Simple use cases, consistent chunk sizes.
 
@@ -24,7 +26,7 @@ chunker = DocumentChunker(strategy="character", chunk_size=500)
 
 ## markdown
 
-`MarkdownTextSplitter` - Splits markdown preserving structure.
+`MarkdownTextSplitter` from [LangChain](https://python.langchain.com/docs/modules/data_connection/document_transformers/) - Splits markdown preserving structure.
 
 Best for: Markdown documents where header hierarchy should be respected.
 
@@ -34,7 +36,7 @@ chunker = DocumentChunker(strategy="markdown", chunk_size=800)
 
 ## markdown_headers
 
-`MarkdownHeaderTextSplitter` - Splits by markdown headers only.
+`MarkdownHeaderTextSplitter` from [LangChain](https://python.langchain.com/docs/modules/data_connection/document_transformers/) - Splits by markdown headers only.
 
 Best for: When you want to group content by section headers.
 
@@ -44,7 +46,7 @@ chunker = DocumentChunker(strategy="markdown_headers")
 
 ## html_headers
 
-`HTMLHeaderTextSplitter` - Splits HTML by header tags.
+`HTMLHeaderTextSplitter` from [LangChain](https://python.langchain.com/docs/modules/data_connection/document_transformers/) - Splits HTML by header tags.
 
 Best for: HTML documents, web page content.
 
@@ -54,7 +56,7 @@ chunker = DocumentChunker(strategy="html_headers")
 
 ## semantic
 
-`SemanticChunker` - Uses embeddings to split text based on semantic similarity.
+`SemanticChunker` from [LangChain Experimental](https://python.langchain.com/docs/modules/data_connection/document_transformers/) - Uses embeddings to split text based on semantic similarity.
 
 Best for: When you want chunks that maintain semantic coherence, better for RAG retrieval quality.
 
@@ -73,7 +75,7 @@ chunker = DocumentChunker(
 ### Semantic Chunking Parameters
 
 | Parameter | Default | Description |
-|-----------|--------|-------------|
+|-----------|---------|-------------|
 | `embeddings` | required | Embedding model (e.g., OpenAIEmbeddings) |
 | `breakpoint_threshold_type` | `"percentile"` | Method for determining breakpoints |
 | `breakpoint_threshold_amount` | `95` | Threshold value |
@@ -111,3 +113,8 @@ chunker = DocumentChunker(
     breakpoint_threshold_amount=99,
 )
 ```
+
+## Further Reading
+
+- [LangChain Text Splitters Documentation](https://python.langchain.com/docs/modules/data_connection/document_transformers/)
+- [Why split text? - LangChain Best Practices](https://python.langchain.com/docs/modules/data_connection/document_transformers/why_split)

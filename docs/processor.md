@@ -1,19 +1,19 @@
 # Doc Processor
 
-A unified module that combines chunking and indexing into a single class.
+A unified module that combines chunking and indexing into a single class. Built on top of [LangChain](https://python.langchain.com/).
 
 ## Features
 
 - **Single initialization** for both chunking and indexing
-- **All chunking strategies** from DocumentChunker
-- **50+ vector stores** from DocIndexer
+- **All chunking strategies** from [LangChain text splitters](https://python.langchain.com/docs/modules/data_connection/document_transformers/)
+- **50+ vector stores** from [LangChain vector store integrations](https://python.langchain.com/docs/integrations/vectorstores/)
 - **End-to-end processing**: file/directory to indexed chunks
 - **Search-ready**: immediate similarity search after processing
 
 ## Quick Start
 
 ```python
-from doc_processor import DocProcessor
+from chunkin_processor import DocProcessor
 from langchain_openai import OpenAIEmbeddings
 
 processor = DocProcessor(
@@ -28,6 +28,27 @@ chunks = processor.process_file("document.pdf")
 
 # Search
 results = processor.search("your query", k=3)
+```
+
+## LangChain Integration
+
+DocProcessor combines LangChain components:
+
+- **Document Loaders**: Load documents from various formats
+- **Text Splitters**: Split documents into chunks using different strategies
+- **Vector Stores**: Store and search chunk embeddings
+
+```python
+from chunkin_processor import DocProcessor
+from langchain_openai import OpenAIEmbeddings
+from langchain_core.documents import Document
+
+# All LangChain-compatible
+processor = DocProcessor(
+    embeddings=OpenAIEmbeddings(),
+    vector_store_type="chroma",
+    persist_directory="./vector_db",
+)
 ```
 
 ## Configuration Options
@@ -55,7 +76,7 @@ results = processor.search("your query", k=3)
 
 ### Strategies
 
-**Chunking strategies** (from DocumentChunker):
+**Chunking strategies** (from [LangChain text splitters](https://python.langchain.com/docs/modules/data_connection/document_transformers/)):
 - `recursive` - RecursiveCharacterTextSplitter (default)
 - `character` - CharacterTextSplitter
 - `markdown` - MarkdownTextSplitter
@@ -118,3 +139,9 @@ processor.chunker        # Access underlying DocumentChunker
 processor.indexer       # Access underlying DocIndexer
 processor.chunks        # All stored chunks
 ```
+
+## See Also
+
+- [LangChain Documentation](https://python.langchain.com/)
+- [LangChain Text Splitters](https://python.langchain.com/docs/modules/data_connection/document_transformers/)
+- [LangChain Vector Stores](https://python.langchain.com/docs/modules/data_connection/vectorstores/)
