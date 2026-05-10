@@ -4,8 +4,8 @@ A Python module for indexing chunked documents into various vector stores.
 
 ## Features
 
-- **35+ vector store support** including local and cloud options
-- **Local-first options**: FAISS, Chroma, Milvus, LanceDB, LambdaDB (no external service required)
+- **50+ vector store support** including local and cloud options
+- **Local-first options**: FAISS, Chroma, Milvus, LanceDB, LambdaDB, Deep Lake (no external service required)
 - **Unified interface**: Same API for all vector stores
 - **Search**: Similarity search with optional metadata filtering
 
@@ -33,40 +33,77 @@ results = indexer.search("your query", k=3)
 
 ### Local (No External Service)
 
-| Store | Type | Persistence |
-|-------|------|-------------|
-| FAISS | In-memory + file | ✅ Save/load |
-| Chroma | Local DB | ✅ Auto-persist |
-| Milvus | SQLite | ✅ File-based |
-| LanceDB | Local DB | ✅ Auto-persist |
-| LambdaDB | Local DB | ✅ Auto-persist |
-| Annoy | File-based | ✅ Save |
+| Store | Type | Package |
+|-------|------|---------|
+| FAISS | In-memory + file | langchain-community |
+| Chroma | Local DB | langchain-chroma |
+| Milvus | SQLite | langchain-milvus |
+| LanceDB | Local DB | langchain-lancedb |
+| LambdaDB | Local DB | langchain-lambdadb |
+| Deep Lake | Local DB | langchain-deeplake |
+| Annoy | File-based | langchain-community |
+| InMemory | In-memory | langchain-core |
 
-### Cloud Services
+### Amazon Web Services (AWS)
+
+| Store | Type | Credentials |
+|-------|------|-------------|
+| OpenSearch | Search | `OPENSEARCH_URL` |
+| Valkey | Redis | `VALKEY_URL` |
+| DocumentDB | MongoDB | `DOCUMENT_DB_HOST` |
+
+### Microsoft Azure
+
+| Store | Type | Credentials |
+|-------|------|-------------|
+| Azure AI Search | Search | `AZURE_AI_SEARCH_API_KEY`, `AZURE_AI_SEARCH_ENDPOINT` |
+| Azure Cosmos DB (Mongo vCore) | NoSQL | `AZURE_COSMOS_CONNECTION_STRING` |
+| Azure Cosmos DB NoSQL | NoSQL | `AZURE_COSMOS_NOSQL_ENDPOINT`, `AZURE_COSMOS_NOSQL_TOKEN` |
+
+### Google Cloud
+
+| Store | Type | Credentials |
+|-------|------|-------------|
+| Databricks Vector Search | Search | `DATABRICKS_HOST`, `DATABRICKS_TOKEN` |
+| Vertex AI Vector Search | Search | `GCP_PROJECT`, `VERTEX_AI_INDEX_ID` |
+| BigQuery Vector Search | Search | `GCP_PROJECT`, `BIGQUERY_DATASET` |
+| AlloyDB Vector Search | Search | `ALLOYDB_CLUSTER_ID`, `GCP_PROJECT` |
+
+### Other Cloud/Database
 
 | Store | Provider | Credentials |
 |-------|----------|-------------|
-| Azure AI Search | Microsoft | `AZURE_AI_SEARCH_API_KEY`, `AZURE_AI_SEARCH_ENDPOINT` |
-| Azure Cosmos DB | Microsoft | `AZURE_COSMOS_CONNECTION_STRING` |
+| Qdrant | Qdrant | `QDRANT_URL` |
+| Weaviate | Weaviate | `WEAVIATE_URL` |
+| Pinecone | Pinecone | `PINECONE_API_KEY` |
 | MongoDB Atlas | MongoDB | `MONGODB_ATLAS_CONNECTION_STRING` |
 | PGVector | PostgreSQL | `POSTGRES_CONNECTION_STRING` |
-| Pinecone | Pinecone | `PINECONE_API_KEY` |
-| Weaviate | Weaviate | `WEAVIATE_URL`, `WEAVIATE_API_KEY` |
-| Qdrant | Qdrant | `QDRANT_URL` |
 | Astra DB | DataStax | `ASTRA_DB_API_ENDPOINT`, `ASTRA_DB_APPLICATION_TOKEN` |
 | Elasticsearch | Elastic | `ELASTICSEARCH_URL` |
-| OpenSearch | AWS | `OPENSEARCH_URL` |
 | Oracle | Oracle | `ORACLE_DSN`, `ORACLE_USERNAME`, `ORACLE_PASSWORD` |
 | Turbopuffer | Turbopuffer | `TURBOPUFFER_API_KEY` |
-| Valkey | Valkey Labs | `VALKEY_URL` |
 | CockroachDB | CockroachDB | `COCKROACHDB_CONNECTION_STRING` |
-| Clickhouse | ClickHouse | `CLICKHOUSE_HOST`, etc. |
+| Clickhouse | ClickHouse | `CLICKHOUSE_HOST` |
 | Couchbase | Couchbase | `COUCHBASE_CONNECTION_STRING` |
 | Neo4j | Neo4j | `NEO4J_URL`, `NEO4J_USERNAME`, `NEO4J_PASSWORD` |
 | SingleStore | SingleStore | `SINGLESTORE_CONNECTION_STRING` |
 | Supabase | Supabase | `SUPABASE_CONNECTION_STRING` |
-| MyScale | MyScale | `MYSCALE_HOST`, etc. |
+| MyScale | MyScale | `MYSCALE_HOST` |
 | Zilliz | Zilliz | `ZILLIZ_URI`, `ZILLIZ_TOKEN` |
+| Marqo | Marqo | `MARQO_URL` |
+| Vectara | Vectara | `VECTARA_CUSTOMER_ID`, `VECTARA_API_KEY` |
+| Epsilla | Epsilla | `EPSILLA_HOST` |
 | Meilisearch | Meilisearch | `MEILISEARCH_URL` |
 | Typesense | Typesense | `TYPESENSE_HOST` |
-| Databricks | Databricks | `DATABRICKS_HOST`, `DATABRICKS_TOKEN` |
+| Timescale | Timescale | `TIMESCALE_CONNECTION_STRING` |
+| TileDB | TileDB | `TILEDB_URI` |
+| StarRocks | StarRocks | `STARROCKS_HOST` |
+| DingoDB | DingoDB | `DINGO_URL` |
+
+## All Supported Stores
+
+```python
+from doc_indexer import DocIndexer
+print(DocIndexer.supported_stores())
+# Returns list of all 50+ supported vector store types
+```

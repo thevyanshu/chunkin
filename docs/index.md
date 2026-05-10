@@ -6,9 +6,15 @@ A Python module for processing and chunking various document formats, and indexi
 
 ### [Document Chunker](usage.md)
 Process documents and create chunks for vector store indexing.
+- **8 formats**: PDF, DOCX, TXT, MD, CSV, XLSX, PPT
+- **6 strategies**: recursive, character, markdown, markdown_headers, html_headers, semantic
+- **Batch processing** with directory support
 
 ### [Doc Indexer](indexer.md)
 Index chunks into various vector stores and perform similarity search.
+- **50+ vector stores**: Local, AWS, Azure, Google Cloud, and more
+- **Unified API** for all vector stores
+- **Search** with metadata filtering
 
 ## Quick Start
 

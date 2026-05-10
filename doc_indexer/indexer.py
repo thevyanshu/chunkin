@@ -7,11 +7,33 @@ from langchain_core.embeddings import Embeddings
 
 
 class VectorStoreType(Enum):
+    # Local stores
     FAISS = "faiss"
     CHROMA = "chroma"
     MILVUS = "milvus"
     LANCEDB = "lancedb"
+    LAMBDA_DB = "lambdadb"
     ANNOY = "annoy"
+    DEEP_LAKE = "deep_lake"
+    IN_MEMORY = "in_memory"
+
+    # Amazon AWS
+    OPENSEARCH = "opensearch"
+    VALKEY = "valkey"
+    DOCUMENT_DB = "document_db"
+
+    # Microsoft Azure
+    AZURE_AI_SEARCH = "azure_ai_search"
+    AZURE_COSMOS = "azure_cosmos"
+    AZURE_COSMOS_NOSQL = "azure_cosmos_nosql"
+
+    # Google Cloud
+    DATABRICKS = "databricks"
+    VERTEX_AI = "vertex_ai"
+    BIGQUERY = "bigquery"
+    ALLOYDB = "alloydb"
+
+    # Other cloud/database
     QDRANT = "qdrant"
     WEAVIATE = "weaviate"
     PINECONE = "pinecone"
@@ -19,12 +41,8 @@ class VectorStoreType(Enum):
     PGVECTOR = "pgvector"
     ASTRA_DB = "astra_db"
     ELASTICSEARCH = "elasticsearch"
-    OPENSEARCH = "opensearch"
-    AZURE_AI_SEARCH = "azure_ai_search"
-    AZURE_COSMOS = "azure_cosmos"
     ORACLE = "oracle"
     TURBOPUFFER = "turbopuffer"
-    VALKEY = "valkey"
     COCKROACHDB = "cockroachdb"
     CLICKHOUSE = "clickhouse"
     COUCHBASE = "couchbase"
@@ -33,11 +51,15 @@ class VectorStoreType(Enum):
     SUPABASE = "supabase"
     MYSCALE = "myscale"
     ZILLIZ = "zilliz"
+    MARQO = "marqo"
+    VECTARA = "vectara"
+    EPSILLA = "epsilla"
     MEILISEARCH = "meilisearch"
     TYPESENSE = "typesense"
-    DATABRICKS = "databricks"
-    LAMBDA_DB = "lambdadb"
-    IN_MEMORY = "in_memory"
+    TIMESCALE = "timescale"
+    TILEDB = "tiledb"
+    STARROCKS = "starrocks"
+    DINGO_DB = "dingo_db"
 
 
 class DocIndexer:
@@ -46,12 +68,20 @@ class DocIndexer:
     def __init__(
         self,
         vector_store_type: Literal[
-            "faiss", "chroma", "milvus", "lancedb", "annoy", "qdrant", "weaviate",
-            "pinecone", "mongodb", "pgvector", "astra_db", "elasticsearch",
-            "opensearch", "azure_ai_search", "azure_cosmos", "oracle",
-            "turbopuffer", "valkey", "cockroachdb", "clickhouse", "couchbase",
-            "neo4j", "singlestore", "supabase", "myscale", "zilliz",
-            "meilisearch", "typesense", "databricks", "lambdadb", "in_memory"
+            # Local
+            "faiss", "chroma", "milvus", "lancedb", "lambdadb", "annoy", "deep_lake", "in_memory",
+            # Amazon AWS
+            "opensearch", "valkey", "document_db",
+            # Microsoft Azure
+            "azure_ai_search", "azure_cosmos", "azure_cosmos_nosql",
+            # Google Cloud
+            "databricks", "vertex_ai", "bigquery", "alloydb",
+            # Other
+            "qdrant", "weaviate", "pinecone", "mongodb", "pgvector", "astra_db",
+            "elasticsearch", "oracle", "turbopuffer", "cockroachdb", "clickhouse",
+            "couchbase", "neo4j", "singlestore", "supabase", "myscale", "zilliz",
+            "marqo", "vectara", "epsilla", "meilisearch", "typesense", "timescale",
+            "tiledb", "starrocks", "dingo_db"
         ] = "faiss",
         embeddings: Optional[Embeddings] = None,
         collection_name: str = "documents",
@@ -76,6 +106,7 @@ class DocIndexer:
         self._init_vector_store()
 
     def _init_vector_store(self):
+        # Local stores
         if self.vector_store_type == "faiss":
             self._init_faiss()
         elif self.vector_store_type == "chroma":
@@ -84,8 +115,42 @@ class DocIndexer:
             self._init_milvus()
         elif self.vector_store_type == "lancedb":
             self._init_lancedb()
+        elif self.vector_store_type == "lambdadb":
+            self._init_lambdadb()
         elif self.vector_store_type == "annoy":
             self._init_annoy()
+        elif self.vector_store_type == "deep_lake":
+            self._init_deep_lake()
+        elif self.vector_store_type == "in_memory":
+            self._init_in_memory()
+
+        # Amazon AWS
+        elif self.vector_store_type == "opensearch":
+            self._init_opensearch()
+        elif self.vector_store_type == "valkey":
+            self._init_valkey()
+        elif self.vector_store_type == "document_db":
+            self._init_document_db()
+
+        # Microsoft Azure
+        elif self.vector_store_type == "azure_ai_search":
+            self._init_azure_ai_search()
+        elif self.vector_store_type == "azure_cosmos":
+            self._init_azure_cosmos()
+        elif self.vector_store_type == "azure_cosmos_nosql":
+            self._init_azure_cosmos_nosql()
+
+        # Google Cloud
+        elif self.vector_store_type == "databricks":
+            self._init_databricks()
+        elif self.vector_store_type == "vertex_ai":
+            self._init_vertex_ai()
+        elif self.vector_store_type == "bigquery":
+            self._init_bigquery()
+        elif self.vector_store_type == "alloydb":
+            self._init_alloydb()
+
+        # Other cloud/database
         elif self.vector_store_type == "qdrant":
             self._init_qdrant()
         elif self.vector_store_type == "weaviate":
@@ -100,18 +165,10 @@ class DocIndexer:
             self._init_astra_db()
         elif self.vector_store_type == "elasticsearch":
             self._init_elasticsearch()
-        elif self.vector_store_type == "opensearch":
-            self._init_opensearch()
-        elif self.vector_store_type == "azure_ai_search":
-            self._init_azure_ai_search()
-        elif self.vector_store_type == "azure_cosmos":
-            self._init_azure_cosmos()
         elif self.vector_store_type == "oracle":
             self._init_oracle()
         elif self.vector_store_type == "turbopuffer":
             self._init_turbopuffer()
-        elif self.vector_store_type == "valkey":
-            self._init_valkey()
         elif self.vector_store_type == "cockroachdb":
             self._init_cockroachdb()
         elif self.vector_store_type == "clickhouse":
@@ -128,16 +185,24 @@ class DocIndexer:
             self._init_myscale()
         elif self.vector_store_type == "zilliz":
             self._init_zilliz()
+        elif self.vector_store_type == "marqo":
+            self._init_marqo()
+        elif self.vector_store_type == "vectara":
+            self._init_vectara()
+        elif self.vector_store_type == "epsilla":
+            self._init_epsilla()
         elif self.vector_store_type == "meilisearch":
             self._init_meilisearch()
         elif self.vector_store_type == "typesense":
             self._init_typesense()
-        elif self.vector_store_type == "databricks":
-            self._init_databricks()
-        elif self.vector_store_type == "lambdadb":
-            self._init_lambdadb()
-        elif self.vector_store_type == "in_memory":
-            self._init_in_memory()
+        elif self.vector_store_type == "timescale":
+            self._init_timescale()
+        elif self.vector_store_type == "tiledb":
+            self._init_tiledb()
+        elif self.vector_store_type == "starrocks":
+            self._init_starrocks()
+        elif self.vector_store_type == "dingo_db":
+            self._init_dingo_db()
         else:
             raise ValueError(f"Unknown vector store type: {self.vector_store_type}")
 
@@ -608,6 +673,225 @@ class DocIndexer:
         from langchain_core.vectorstores import InMemoryVectorStore
 
         self._vector_store = InMemoryVectorStore(embedding=self.embeddings)
+
+    def _init_deep_lake(self):
+        from langchain_deeplake import DeepLake
+
+        persist_dir = self.persist_directory or "./deeplake"
+        os.makedirs(persist_dir, exist_ok=True)
+
+        self._vector_store = DeepLake(
+            embedding=self.embeddings,
+            path=persist_dir,
+            collection_name=self.collection_name,
+        )
+
+    def _init_document_db(self):
+        from langchain_aws import AmazonDocumentdbVectorSearch
+
+        host = self.kwargs.get("host") or os.getenv("DOCUMENT_DB_HOST")
+        port = self.kwargs.get("port") or int(os.getenv("DOCUMENT_DB_PORT", "27017"))
+        collection = self.kwargs.get("collection")
+        index_name = self.index_name or self.collection_name
+
+        if not host:
+            raise ValueError("DOCUMENT_DB_HOST required")
+
+        self._vector_store = AmazonDocumentdbVectorSearch(
+            embedding=self.embeddings,
+            collection_name=collection,
+            host=host,
+            port=port,
+            index_name=index_name,
+        )
+
+    def _init_azure_cosmos_nosql(self):
+        from langchain_azure_cosmosdb import AzureCosmosDBNoSqlVectorSearch
+
+        api_endpoint = self.kwargs.get("api_endpoint") or os.getenv("AZURE_COSMOS_NOSQL_ENDPOINT")
+        token = self.kwargs.get("token") or os.getenv("AZURE_COSMOS_NOSQL_TOKEN")
+        database_name = self.kwargs.get("database_name") or "vectors"
+        container_name = self.kwargs.get("container_name") or self.collection_name
+
+        if not api_endpoint or not token:
+            raise ValueError("AZURE_COSMOS_NOSQL_ENDPOINT and AZURE_COSMOS_NOSQL_TOKEN required")
+
+        self._vector_store = AzureCosmosDBNoSqlVectorSearch(
+            embedding=self.embeddings,
+            api_endpoint=api_endpoint,
+            token=token,
+            database_name=database_name,
+            container_name=container_name,
+        )
+
+    def _init_vertex_ai(self):
+        from langchain_google_vertexai import VertexAIVectorSearch
+
+        project = self.kwargs.get("project") or os.getenv("GCP_PROJECT")
+        region = self.kwargs.get("region") or os.getenv("GCP_REGION", "us-central1")
+        index_id = self.kwargs.get("index_id") or os.getenv("VERTEX_AI_INDEX_ID")
+
+        if not project or not index_id:
+            raise ValueError("GCP_PROJECT and VERTEX_AI_INDEX_ID required")
+
+        self._vector_store = VertexAIVectorSearch(
+            project=project,
+            region=region,
+            index_id=index_id,
+            embedding=self.embeddings,
+        )
+
+    def _init_bigquery(self):
+        from langchain_google_community import BigQueryVectorSearch
+
+        project = self.kwargs.get("project") or os.getenv("GCP_PROJECT")
+        dataset = self.kwargs.get("dataset") or os.getenv("BIGQUERY_DATASET")
+        table_name = self.collection_name
+
+        if not project or not dataset:
+            raise ValueError("GCP_PROJECT and BIGQUERY_DATASET required")
+
+        self._vector_store = BigQueryVectorSearch(
+            project=project,
+            dataset=dataset,
+            table_name=table_name,
+            embedding=self.embeddings,
+        )
+
+    def _init_alloydb(self):
+        from langchain_google_community import AlloyDBVectorSearch
+
+        cluster_id = self.kwargs.get("cluster_id") or os.getenv("ALLOYDB_CLUSTER_ID")
+        project_id = self.kwargs.get("project_id") or os.getenv("GCP_PROJECT")
+        region = self.kwargs.get("region") or os.getenv("GCP_REGION", "us-central1")
+        database = self.kwargs.get("database") or "default"
+        table_name = self.collection_name
+
+        if not cluster_id or not project_id:
+            raise ValueError("ALLOYDB_CLUSTER_ID and GCP_PROJECT required")
+
+        self._vector_store = AlloyDBVectorSearch(
+            cluster_id=cluster_id,
+            project_id=project_id,
+            region=region,
+            database=database,
+            table_name=table_name,
+            embedding=self.embeddings,
+        )
+
+    def _init_marqo(self):
+        from langchain_marqo import Marqo
+
+        url = self.kwargs.get("url") or os.getenv("MARQO_URL")
+        api_key = self.kwargs.get("api_key") or os.getenv("MARQO_API_KEY")
+
+        if not url:
+            raise ValueError("MARQO_URL required")
+
+        mq = Marqo(url=url, api_key=api_key)
+
+        self._vector_store = self._create_marqo_store(mq)
+
+    def _create_marqo_store(self, marqo_client):
+        from langchain_marqo import MarqoVectorStore
+
+        return MarqoVectorStore(
+            client=marqo_client,
+            collection_name=self.collection_name,
+            embedding=self.embeddings,
+        )
+
+    def _init_vectara(self):
+        from langchain_vectara import VectaraVectorStore
+
+        api_key = self.kwargs.get("api_key") or os.getenv("VECTARA_API_KEY")
+        customer_id = self.kwargs.get("customer_id") or os.getenv("VECTARA_CUSTOMER_ID")
+
+        if not customer_id or not api_key:
+            raise ValueError("VECTARA_CUSTOMER_ID and VECTARA_API_KEY required")
+
+        self._vector_store = VectaraVectorStore(
+            vectara_customer_id=customer_id,
+            vectara_corpus_id=self.collection_name,
+            vectara_api_key=api_key,
+        )
+
+    def _init_epsilla(self):
+        from langchain_epsilla import EpsillaVectorStore
+
+        host = self.kwargs.get("host") or os.getenv("EPSILLA_HOST", "localhost")
+        port = self.kwargs.get("port") or int(os.getenv("EPSILLA_PORT", "37000"))
+
+        self._vector_store = EpsillaVectorStore(
+            embedding=self.embeddings,
+            collection_name=self.collection_name,
+            host=host,
+            port=port,
+        )
+
+    def _init_timescale(self):
+        from langchain_timescalevector import TimescaleVector
+
+        connection_string = self.connection_string or os.getenv("TIMESCALE_CONNECTION_STRING")
+        table_name = self.collection_name
+
+        if not connection_string:
+            raise ValueError("TIMESCALE_CONNECTION_STRING required")
+
+        self._vector_store = TimescaleVector(
+            embedding=self.embeddings,
+            connection_string=connection_string,
+            table_name=table_name,
+        )
+
+    def _init_tiledb(self):
+        from langchain_tiledb import TileDBVectorStore
+
+        uri = self.kwargs.get("uri") or os.getenv("TILEDB_URI") or "./tiledb"
+
+        self._vector_store = TileDBVectorStore(
+            embedding=self.embeddings,
+            uri=uri,
+            index_name=self.index_name or self.collection_name,
+        )
+
+    def _init_starrocks(self):
+        from langchain_starrocks import StarRocksVectorSearch
+
+        host = self.kwargs.get("host") or os.getenv("STARROCKS_HOST")
+        port = self.kwargs.get("port") or int(os.getenv("STARROCKS_PORT", "9030"))
+        user = self.kwargs.get("user") or os.getenv("STARROCKS_USER", "root")
+        password = self.kwargs.get("password") or os.getenv("STARROCKS_PASSWORD", "")
+
+        if not host:
+            raise ValueError("STARROCKS_HOST required")
+
+        self._vector_store = StarRocksVectorSearch(
+            embedding=self.embeddings,
+            host=host,
+            port=port,
+            user=user,
+            password=password,
+            table_name=self.collection_name,
+        )
+
+    def _init_dingo_db(self):
+        from langchain_dingo import DingoDB
+
+        url = self.kwargs.get("url") or os.getenv("DINGO_URL")
+        user = self.kwargs.get("user") or os.getenv("DINGO_USER", "root")
+        password = self.kwargs.get("password") or os.getenv("DINGO_PASSWORD", "")
+
+        if not url:
+            raise ValueError("DINGO_URL required")
+
+        self._vector_store = DingoDB(
+            embedding=self.embeddings,
+            index_name=self.index_name or self.collection_name,
+            url=url,
+            user=user,
+            password=password,
+        )
 
     def index_documents(self, documents: List[Document], **kwargs) -> int:
         if not documents:
