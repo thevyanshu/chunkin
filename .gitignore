@@ -35,6 +35,9 @@ htmlcov/
 .nox/
 pytest.ini
 
+# Testing/Sample usage
+test_usage/
+
 # Logs
 *.log
 logs/
