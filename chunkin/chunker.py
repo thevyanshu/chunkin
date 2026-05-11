@@ -246,27 +246,48 @@ class DocumentChunker:
     def list_chunks(self) -> Dict[str, int]:
         return {file_path: len(chunks) for file_path, chunks in self._chunks.items()}
 
+    def _validate_directory(self, directory: str) -> str:
+        if not os.path.exists(directory):
+            raise NotADirectoryError(f"Directory not found: {directory}")
+
+        abs_path = os.path.abspath(directory)
+        dangerous_patterns = ["..", "~", "$", "`", ";", "|", "&", "&&", "||"]
+        for pattern in dangerous_patterns:
+            if pattern in directory:
+                import warnings
+                warnings.warn(
+                    f"Directory path contains potentially dangerous pattern '{pattern}'. "
+                    f"Path will be normalized to: {abs_path}",
+                    UserWarning,
+                    stacklevel=2
+                )
+
+        return abs_path
+
+    def _validate_extensions(self, extensions: Optional[List[str]]) -> List[str]:
+        if extensions is None:
+            return list(self._EXTENSION_LOADER_MAP.keys())
+
+        ext_list = [ext.lower() if ext.startswith(".") else f".{ext.lower()}" for ext in extensions]
+
+        if not ext_list:
+            raise ValueError("extensions cannot be empty. Provide at least one valid extension.")
+
+        valid_extensions = set(self._EXTENSION_LOADER_MAP.keys())
+        invalid = set(ext_list) - valid_extensions
+        if invalid:
+            raise ValueError(f"Unsupported extensions: {invalid}. Supported: {valid_extensions}")
+
+        return ext_list
+
     def batch_chunks(
         self,
         directory: str,
         extensions: Optional[List[str]] = None,
         recursive: bool = False,
     ) -> Dict[str, List[Document]]:
-        if not os.path.exists(directory):
-            raise NotADirectoryError(f"Directory not found: {directory}")
-
-        if extensions is None:
-            extensions = list(self._EXTENSION_LOADER_MAP.keys())
-
-        extensions = [ext.lower() if ext.startswith(".") else f".{ext.lower()}" for ext in extensions]
-
-        if not extensions:
-            raise ValueError("extensions cannot be empty. Provide at least one valid extension.")
-
-        valid_extensions = set(self._EXTENSION_LOADER_MAP.keys())
-        invalid = set(extensions) - valid_extensions
-        if invalid:
-            raise ValueError(f"Unsupported extensions: {invalid}. Supported: {valid_extensions}")
+        directory = self._validate_directory(directory)
+        extensions = self._validate_extensions(extensions)
 
         all_chunks: Dict[str, List[Document]] = {}
         pattern = "**/*" if recursive else "*"
@@ -287,16 +308,8 @@ class DocumentChunker:
         extensions: Optional[List[str]] = None,
         recursive: bool = False,
     ) -> Iterator[tuple[str, List[Document]]]:
-        if not os.path.exists(directory):
-            raise NotADirectoryError(f"Directory not found: {directory}")
-
-        if extensions is None:
-            extensions = list(self._EXTENSION_LOADER_MAP.keys())
-
-        extensions = [ext.lower() if ext.startswith(".") else f".{ext.lower()}" for ext in extensions]
-
-        if not extensions:
-            raise ValueError("extensions cannot be empty. Provide at least one valid extension.")
+        directory = self._validate_directory(directory)
+        extensions = self._validate_extensions(extensions)
 
         pattern = "**/*" if recursive else "*"
 
@@ -306,7 +319,7 @@ class DocumentChunker:
                     chunks = self.create_chunks(str(file_path))
                     yield str(file_path), chunks
                 except Exception as e:
-                    print(f"Warning: Failed to process {file_path}: {e}")
+                    raise RuntimeError(f"Failed to process {file_path}: {e}") from e
 
     @classmethod
     def supported_formats(cls) -> List[str]:

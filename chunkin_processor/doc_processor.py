@@ -1,10 +1,15 @@
 import os
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union, Iterator
 
 from chunkin import DocumentChunker
 from chunkin_indexer import DocIndexer, VectorStoreType
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
+
+
+class DocProcessorError(Exception):
+    """Custom exception for DocProcessor errors."""
+    pass
 
 
 class DocProcessor:
@@ -32,6 +37,7 @@ class DocProcessor:
         persist_directory: Optional[str] = None,
         connection_string: Optional[str] = None,
         index_name: Optional[str] = None,
+        continue_on_error: bool = False,
         **kwargs,
     ):
         self.embeddings = embeddings
@@ -54,7 +60,9 @@ class DocProcessor:
         self.persist_directory = persist_directory
         self.connection_string = connection_string
         self.index_name = index_name
+        self.continue_on_error = continue_on_error
         self.kwargs = kwargs
+        self._errors: List[tuple[str, Exception]] = []
 
         self._chunker = self._create_chunker()
         self._indexer = self._create_indexer()
@@ -129,7 +137,8 @@ class DocProcessor:
         directory: str,
         extensions: Optional[List[str]] = None,
         recursive: bool = False,
-    ):
+    ) -> Iterator[tuple[str, List[Document]]]:
+        self._errors = []
         for file_path, chunks in self._chunker.batch_chunks_stream(
             directory=directory,
             extensions=extensions,
@@ -139,7 +148,21 @@ class DocProcessor:
                 self._indexer.index_documents(chunks)
                 yield file_path, chunks
             except Exception as e:
-                print(f"Error processing {file_path}: {e}")
+                if self.continue_on_error:
+                    self._errors.append((file_path, e))
+                else:
+                    raise DocProcessorError(
+                        f"Failed to index document '{file_path}': {e}. "
+                        "Set continue_on_error=True to skip failed files."
+                    ) from e
+
+    def get_errors(self) -> List[tuple[str, Exception]]:
+        """Return list of errors that occurred during processing."""
+        return self._errors.copy()
+
+    def clear_errors(self) -> None:
+        """Clear the error history."""
+        self._errors = []
 
     def search(self, query: str, k: int = 4, filters: Optional[Dict[str, Any]] = None) -> List[Document]:
         return self._indexer.search(query, k=k, filters=filters)

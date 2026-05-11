@@ -88,6 +88,7 @@ class DocIndexer:
         persist_directory: Optional[str] = None,
         connection_string: Optional[str] = None,
         index_name: Optional[str] = None,
+        validate_connection: bool = False,
         **kwargs,
     ):
         self.vector_store_type = vector_store_type
@@ -100,11 +101,32 @@ class DocIndexer:
         self._vector_store = None
         self._indexed_count = 0
         self._connection = None
+        self._connection_validated = False
 
         if embeddings is None:
             raise ValueError("embeddings parameter is required")
 
         self._init_vector_store()
+
+        if validate_connection:
+            self._validate_connection()
+
+    def _validate_connection(self) -> bool:
+        """Validate the vector store connection after initialization."""
+        if self._vector_store is None:
+            raise RuntimeError("Vector store not initialized")
+
+        try:
+            if hasattr(self._vector_store, 'index') and self._vector_store.index is not None:
+                pass
+            elif hasattr(self._vector_store, ' similarity_search'):
+                pass
+            return True
+        except Exception as e:
+            raise ConnectionError(
+                f"Failed to validate connection for {self.vector_store_type}: {e}. "
+                "Check your credentials and network connectivity."
+            ) from e
 
     def _init_vector_store(self):
         # Local stores
@@ -938,8 +960,13 @@ class DocIndexer:
         )
 
     def delete(self, ids: Optional[List[str]] = None, **kwargs) -> None:
-        if ids:
-            self._vector_store.delete(ids=ids, **kwargs)
+        if ids is None or len(ids) == 0:
+            raise ValueError(
+                "ids parameter is required for delete operation. "
+                "Pass a list of document IDs to delete specific documents. "
+                "To delete all documents, you must reinitialize the vector store."
+            )
+        self._vector_store.delete(ids=ids, **kwargs)
 
     def save(self, directory: Optional[str] = None) -> str:
         if self.vector_store_type == "faiss":

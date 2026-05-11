@@ -294,13 +294,23 @@ class TestDocIndexer:
         results = indexer.search_with_score("Python", k=1)
         assert isinstance(results, list)
 
-    def test_delete(self):
+    def test_delete_requires_ids(self):
         from chunkin_indexer import DocIndexer
         mock_embeddings = MagicMock()
         mock_embeddings.embed_query.return_value = [0.1] * 1536
         indexer = DocIndexer(vector_store_type="in_memory", embeddings=mock_embeddings)
-        indexer.delete()
+
+        with pytest.raises(ValueError, match="ids parameter is required"):
+            indexer.delete()
+
+        with pytest.raises(ValueError, match="ids parameter is required"):
+            indexer.delete(ids=None)
+
+        with pytest.raises(ValueError, match="ids parameter is required"):
+            indexer.delete(ids=[])
+
         indexer.delete(ids=["test_id"])
+        print("   [PASS] Delete requires explicit ids")
 
 
 class TestDocProcessor:
@@ -405,13 +415,46 @@ class TestDocProcessor:
 
     def test_delete_method(self):
         from chunkin_processor import DocProcessor
+        from chunkin_processor.doc_processor import DocProcessorError
         mock_embeddings = MagicMock()
         mock_embeddings.embed_query.return_value = [0.1] * 1536
         processor = DocProcessor(
             embeddings=mock_embeddings,
             vector_store_type="in_memory"
         )
-        processor.delete()
+
+        with pytest.raises(ValueError, match="ids parameter is required"):
+            processor.delete()
+
+        processor.delete(ids=["test_id"])
+        print("   [PASS] Delete method works with ids")
+
+    def test_process_directory_stream_error_handling(self):
+        from chunkin_processor import DocProcessor
+        from chunkin_processor.doc_processor import DocProcessorError
+        import tempfile
+
+        mock_embeddings = MagicMock()
+        mock_embeddings.embed_query.return_value = [0.1] * 1536
+
+        processor = DocProcessor(
+            embeddings=mock_embeddings,
+            vector_store_type="in_memory",
+            continue_on_error=False
+        )
+
+        with pytest.raises((DocProcessorError, NotADirectoryError)):
+            list(processor.process_directory_stream("/nonexistent/path"))
+
+        processor2 = DocProcessor(
+            embeddings=mock_embeddings,
+            vector_store_type="in_memory",
+            continue_on_error=True
+        )
+
+        errors = processor2.get_errors()
+        assert errors == []
+        print("   [PASS] Error handling works")
         processor.delete(ids=["test_id"])
 
 
