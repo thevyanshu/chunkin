@@ -181,7 +181,6 @@ class DocumentChunker:
                 min_chunk_size=min_chunk_size,
                 buffer_size=buffer_size,
                 add_start_index=add_start_index,
-                nb_suffix=nb_suffix,
             )
         else:
             raise ValueError(f"Unknown strategy: {strategy}")
